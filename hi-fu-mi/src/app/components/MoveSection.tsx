@@ -1,0 +1,47 @@
+"use client";
+
+import React from "react";
+import Loading from "./Loading";
+
+const MoveSection = ({ playerId, handleMoveSelection }) => {
+    const moveChoices = ["🪨", "📃", "✂️"];
+
+    const onMoveChange = (event) => {
+        handleMoveSelection(playerId, event.target.value);
+    };
+
+    return (
+        <div className="relative z-50 flex flex-col items-center justify-center gap-10">
+            <Loading textContent="Waiting for a player move" />
+            <div className="relative w-2/3">
+                <div className="flex flex-col items-center h-fit gap-1 p-4 px-2 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
+                    <p className="text-xl font-bold mb-6">Select your move</p>
+                    <form className="move-choice-list flex flex-wrap items-center justify-center gap-14 p-4">
+                        {moveChoices.map((move, index) => (
+                            <div key={`dot${index}`} className="group">
+                                <input
+                                    type="radio"
+                                    name="mooveChoice"
+                                    id={`choice-${index}`}
+                                    value={move}
+                                    className="hidden"
+                                    onChange={onMoveChange}
+                                />
+                                <label
+                                    htmlFor={`choice-${index}`}
+                                    className="text-4xl p-2 rounded-full border-2 border-white hover:cursor-pointer transition-all"
+                                >
+                                    {move}
+                                </label>
+                            </div>
+                        ))}
+                    </form>
+                </div>
+                <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-pink-300 rounded-sm z-[3] translate-x-0 translate-y-0"></span>
+                <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-yellow-300 rounded-sm z-[2] translate-x-2 translate-y-2"></span>
+            </div>
+        </div>
+    );
+};
+
+export default MoveSection;

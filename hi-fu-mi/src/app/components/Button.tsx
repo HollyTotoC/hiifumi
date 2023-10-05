@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 
 interface ButtonProps {
     content: string;
-    type: string;
+    type?: "button" | "submit" | "reset" | undefined;
     onClick: () => void;
 }
 
@@ -23,7 +23,7 @@ const Button = ({ content, onClick, type }: ButtonProps) => {
     }, [content]);
 
     return (
-        <button className="group relative mt-16" onClick={onClick} type={type}>
+        <button className="group relative" onClick={onClick} type={type}>
             <div className="relative border-2 border-black rounded-sm p-3 text-lg font-bold z-[4] bg-white transform lg:translate-x-0 lg:translate-y-0 group-hover:translate-x-[-0.5rem] group-hover:translate-y-[-0.5rem] translate-x-[-0.5rem] translate-y-[-0.5rem] group-active:translate-x-[-0.25rem] group-active:translate-y-[-0.25rem] transition-transform duration-300">
                 {decodedContent}
             </div>

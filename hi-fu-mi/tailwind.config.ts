@@ -2,9 +2,9 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
     content: [
-        "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-        "./components/**/*.{js,ts,jsx,tsx,mdx}",
-        "./app/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/api/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
         extend: {
@@ -50,11 +50,33 @@ const config: Config = {
                         padding: "0.25rem",
                     },
                 },
+                scalePulse: {
+                    "0%, 10%, 100%": { transform: "scale(1)" },
+                    "5%": { transform: "scale(1.2)" },
+                },
+                slideInFromLeft: {
+                    "0%, 100%": { transform: "translateX(-100%)" },
+                    "5%, 95%": { transform: "translateX(0%)" },
+                },
+                slideInFromRight: {
+                    "0%, 100%": { transform: "translateX(100%)" },
+                    "5%, 95%": { transform: "translateX(0%)" },
+                },
+                scoreDisplay: {
+                    "0%, 100%": { transform: "scale(0)" },
+                    "15%, 85%": { transform: "scale(1)" },
+                },
             },
             animation: {
                 customFadeOut: "customFadeOut 700ms forwards",
                 customFlex: "customFadeOut 700ms forwards",
                 customBorder: "customBorder 1400ms forwards",
+                "scalePulse-0": "scalePulse 3s infinite",
+                "scalePulse-500": "scalePulse 3s 0.3s infinite",
+                "scalePulse-1000": "scalePulse 3s 0.6s infinite",
+                slideInFromLeft: "slideInFromLeft 5s ease-in-out forwards",
+                slideInFromRight: "slideInFromRight 5s ease-in-out forwards",
+                scoreDisplay: "scoreDisplay 5s ease-in-out forwards",
             },
         },
     },

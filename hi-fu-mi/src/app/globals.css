@@ -26,13 +26,19 @@ body {
     rgb(var(--background-start-rgb));
 } */
 
-
 body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-input[type="radio"]:checked + label {
+/* For the avatar radio buttons */
+.avatar-list input[type="radio"]:checked + label {
+  border: 2px solid black;
+}
+
+
+/* For the move choice radio buttons */
+.move-choice-list input[type="radio"]:checked + label {
   border: 2px solid black;
 }

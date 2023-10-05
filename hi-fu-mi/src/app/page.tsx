@@ -1,7 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Button from "./components/Button";
 import Image from "next/image";
+import { useSocket } from "./utils/socketContext";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
     const [isActive, setIsActive] = useState(true);
@@ -9,6 +12,61 @@ export default function Home() {
     const [playerProfile, setPlayerProfile] = useState({});
     const [playerName, setPlayerName] = useState("");
     const [playerAvatar, setPlayerAvatar] = useState(null);
+    const router = useRouter();
+    const socket = useSocket();
+    const urlRoomId = useSearchParams().get("rid")?.replace("?rid=", "");
+
+    useEffect(() => {
+        console.table({
+            isActive,
+            isSet,
+            playerProfile,
+            playerName,
+            playerAvatar,
+            socket,
+        });
+    }, [isActive, isSet, playerProfile, playerName, playerAvatar, socket]);
+
+    const playWithFriend = () => {
+        if (socket) {
+            // Send player profile along with the createRoom event
+            socket.emit("createRoom", {
+                private: true,
+                profile: playerProfile,
+            });
+            socket.on("roomCreated", (roomId) => {
+                // Navigate to the game page with the roomId
+                router.push(`/game/${roomId}?lpi=${playerProfile.id}`);
+            });
+        }
+    };
+
+    const joinFriend = (profile) => {
+        if (socket && urlRoomId) {
+            console.log("Emitting joinRoom with profile:", profile);
+            socket.emit("joinRoom", {
+                roomId: urlRoomId,
+                profile: profile,
+            });
+            socket.on("roomJoined", (roomId) => {
+                router.push(`/game/${roomId}?lpi=${profile.id}&invite=true`);
+            });
+        }
+    };
+
+    const playWithRandomPlayer = () => {
+        if (socket) {
+            // Send player profile along with the findRoom event
+            socket.emit("findRoom", playerProfile);
+            socket.on("roomFound", (roomId) => {
+                if (playerProfile.id) {
+                    router.push(
+                        `/game/${roomId}?lpi=${playerProfile.id}&rdm=true`
+                    );
+                }
+            });
+        }
+    };
 
     const handleButtonClick = () => {
         setIsActive(!isActive);
@@ -24,21 +82,24 @@ export default function Home() {
 
     const handleSubmitPlayer = (e) => {
         e.preventDefault();
+        console.log(urlRoomId, "pas la merde");
+        const newProfile = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: playerName,
+            avatar: playerAvatar,
+        };
 
-        if (playerName && playerAvatar) {
-            setPlayerProfile({
-                id: Math.random().toString(36).substr(2, 9),
-                name: playerName,
-                avatar: playerAvatar,
-            });
+        if (playerName && playerAvatar && !urlRoomId) {
+            setPlayerProfile(newProfile);
             setIsSet(true);
-            console.log("playerProfile", playerProfile);
+        } else if (playerName && playerAvatar && urlRoomId) {
+            setPlayerProfile(newProfile);
+            console.log(newProfile, "before la merde");
+            joinFriend(newProfile);
         } else {
             alert("Please select a name and an avatar!");
         }
     };
-
-    console.log("isActive", isActive, playerName, playerAvatar);
 
     return (
         <>
@@ -79,7 +140,7 @@ export default function Home() {
                     </p>
                 </div>
                 <div
-                    className={`transition-all duration-700 delay-100 ${
+                    className={`transition-all duration-700 delay-100 mt-16 ${
                         isActive ? "opacity-100" : "animate-customFadeOut"
                     }`}
                 >
@@ -99,7 +160,7 @@ export default function Home() {
                     className="flex flex-col px-10 mt-auto mb-auto"
                     onSubmit={handleSubmitPlayer}
                 >
-                    <div className="flex flex-col gap-14 p-10 bg-blue-300 border-2 border-black rounded-sm">
+                    <div className="flex flex-col gap-14 p-10 bg-blue-300 border-2 border-black rounded-sm mb-16">
                         <div className="flex flex-col items-start justify-center gap-1 ">
                             <label
                                 htmlFor="playerName"
@@ -122,7 +183,7 @@ export default function Home() {
                             >
                                 Player Avatar
                             </label>
-                            <ul className="flex flex-row items-center justify-evenly gap-4 w-full text-base flex-wrap">
+                            <ul className="avatar-list flex flex-row items-center justify-evenly gap-4 w-full text-base flex-wrap">
                                 {[1, 2, 3, 4, 5, 6].map((num) => (
                                     <li
                                         key={num}
@@ -163,7 +224,7 @@ export default function Home() {
                 </form>
             </section>
             <section className="relative h-[100vh] w-screen flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
-                <div className="flex flex-col px-10 mt-auto mb-auto">
+                <div className="flex flex-col px-10 mt-auto mb-auto gap-16">
                     <div>
                         <img src="" alt="" />
                         <p>
@@ -173,16 +234,17 @@ export default function Home() {
                             the game. May the best player win !
                         </p>
                     </div>
-                    <Button
-                        type=""
-                        content="Play&nbsp;with&nbsp;a&nbsp;friend"
-                        onClick={() => {}}
-                    />
-                    <Button
-                        type=""
-                        content="Play&nbsp;random&nbsp;player"
-                        onClick={() => {}}
-                    />
+                    <div className="flex flex-col items-center gap-10">
+                        <Button
+                            content="Play&nbsp;with&nbsp;a&nbsp;friend"
+                            onClick={playWithFriend}
+                        />
+
+                        <Button
+                            content="Play&nbsp;random&nbsp;player"
+                            onClick={playWithRandomPlayer}
+                        />
+                    </div>
                 </div>
             </section>
         </>

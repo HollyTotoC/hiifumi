@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "workspaces": [
+    "hi-fu-mi",
+    "server"
+  ],
+  "scripts": {
+    "hi-fu-mi": "yarn workspace hi-fu-mi dev",
+    "server": "yarn workspace server start",
+    "dev": "concurrently \"yarn hi-fu-mi\" \"yarn server\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
