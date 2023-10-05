@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import cors from "cors"; // <-- Import the cors library
 import { isValidMove, determineWinner } from "./utils/gameLogic.ts";
 import { createRoom, findAvailableRoom } from "./utils/roomManager.ts";
-import { Player, Room, Rooms } from "./type";
 
 const app = express();
 
@@ -23,12 +22,46 @@ const io = new Server(server, {
   },
 });
 
-const WAITING_FOR_PLAYER = 0;
 const BOTH_PLAYERS_CONNECTED = 1;
 const SHOW_RESULT = 2;
 const FINAL_SCORE = 3;
 
-let rooms: Rooms = {};
+class Player {
+  constructor(
+    public id: string,
+    public name: string,
+    public avatar: string,
+    public score: number = 0,
+    public move: string | null = null,
+    public moveSet: boolean = false,
+    public isReady: boolean = false,
+  ) {}
+}
+
+class Room {
+  public p1: Player | null = null;
+  public p2: Player | null = null;
+  public round: number = 1;
+  public displayStep: number = 1;
+
+  constructor(public id: string) {}
+
+  addPlayer(player: Player) {
+    if (!this.p1) {
+      this.p1 = player;
+    } else if (!this.p2) {
+      this.p2 = player;
+    }
+  }
+
+  isReady(): boolean {
+    return this.p1 !== null && this.p2 !== null;
+  }
+}
+
+const rooms: Map<string, Room> = new Map();
+const randomQueue: Player[] = [];
+const friendQueue: Map<string, Player[]> = new Map();
 
 // const updateDisplayStep = (roomId: string, step: number) => {
 //   rooms[roomId].displayStep = step;
@@ -41,196 +74,191 @@ const handlePlayerMove = (
   move: string,
   playerId: string,
 ) => {
-  const room = rooms[roomId];
-  if (room.p1.id === playerId) {
-    room.p1.move = move;
-    room.p1.moveSet = true;
-  } else if (room.p2 && room.p2.id === playerId) {
-    room.p2.move = move;
-    room.p2.moveSet = true;
-  }
-
-  console.log(`Player ${playerKey} in Room ${roomId}:`);
-  console.table(room[playerKey]);
-
-  if (room.p1.moveSet && room.p2 && room.p2.moveSet) {
-    const result = determineWinner(room.p1.move!, room.p2.move!);
-    if (result === "A") room.p1.score += 1;
-    else if (result === "B") room.p2.score += 1;
-    else if (result === "Tie") {
-      // Handle the tie scenario
-      console.log("It's a tie!");
+  const room = rooms.get(roomId);
+  if (room) {
+    if (room.p1 && room.p1.id === playerId) {
+      room.p1.move = move;
+      room.p1.moveSet = true;
+    } else if (room.p2 && room.p2.id === playerId) {
+      room.p2.move = move;
+      room.p2.moveSet = true;
     }
+    console.log(`Player ${playerKey} in Room ${roomId}:`);
+    console.table(room[playerKey]);
+    console.log("Room:", room);
 
-    console.log("Round Result:");
-    console.log(
-      `Winner: ${
-        result === "Tie" ? "No one, it's a tie!" : `Player ${result}`
-      }`,
-    );
-    console.log(`Player 1 Score: ${room.p1.score}`);
-    console.log(`Player 2 Score: ${room.p2.score}`);
+    if (room.p1 && room.p1.moveSet && room.p2 && room.p2.moveSet) {
+      const result = determineWinner(room.p1.move!, room.p2.move!);
+      if (result === "A") room.p1.score += 1;
+      else if (result === "B") room.p2.score += 1;
+      else if (result === "Tie") {
+        // Handle the tie scenario
+        console.log("It's a tie!");
+      }
 
-    room.displayStep = SHOW_RESULT;
-    io.to(roomId).emit("roundResult", {
-      winner: result,
-      scores: {
-        playerA: room.p1.score,
-        playerB: room.p2.score,
-      },
-    });
+      console.log("Round Result:");
+      console.log(
+        `Winner: ${
+          result === "Tie" ? "No one, it's a tie!" : `Player ${result}`
+        }`,
+      );
+      console.log(`Player 1 Score: ${room.p1.score}`);
+      console.log(`Player 2 Score: ${room.p2.score}`);
 
-    room.p1.move = null;
-    room.p1.moveSet = false;
-    room.p2.move = null;
-    room.p2.moveSet = false;
-    if (result !== "Tie") room.round += 1; // Only increment the round if it's not a tie
-    room.displayStep = BOTH_PLAYERS_CONNECTED;
-  } else {
-    room.displayStep = BOTH_PLAYERS_CONNECTED;
+      room.displayStep = SHOW_RESULT;
+      console.log("Room before result:", room);
+      io.to(roomId).emit("updateRoom", { room, result: result });
+    }
   }
+  console.log("Room before refresh:", room);
+  io.to(roomId).emit("updateRoom", room);
 };
 
 io.on("connection", (socket) => {
   console.log("Rooms:", rooms);
   console.log("A user connected");
 
-  socket.on("createRoom", (data) => {
-    const isPrivate = data.private;
-    const playerProfile = data.profile;
-    const roomId = createRoom(isPrivate);
-    rooms[roomId] = {
-      p1: {
-        ...playerProfile,
-        move: null,
-        score: 0,
-        moveSet: false,
-      },
-      round: 1,
-      displayStep: WAITING_FOR_PLAYER,
-      isPrivate: isPrivate,
-      id: roomId,
-    };
-    console.log("Create Rooms:");
-    console.log("Room ID:", roomId);
-    console.table(rooms[roomId]);
-    console.log("p1 infos");
-    console.table(rooms[roomId].p1);
-
-    socket.join(roomId);
-    socket.emit("roomCreated", roomId);
-  });
-
-  socket.on("getInitialState", (roomId) => {
-    console.log("Room ID initial:", roomId);
-    console.table(rooms[roomId]);
-    socket.emit("initialState", rooms[roomId]);
-  });
-
-  socket.on("joinRoom", (data) => {
+  socket.on("createRoom", (data, callback) => {
+    console.log("Creating room...");
+    console.table(data);
     const roomId = data.roomId;
-    const playerProfile = data.profile;
+    const playerInfo = data.player;
+    const type = data.type;
 
-    // Check if the room exists
-    if (!rooms[roomId]) {
-      console.log("Room not found");
-      return socket.emit("roomJoinError", "Room not found.");
+    const player = new Player(socket.id, playerInfo.name, playerInfo.avatar);
+    if (type === "friend") {
+      if (!friendQueue.has(roomId)) {
+        friendQueue.set(roomId, []);
+      }
+      friendQueue.get(roomId)?.push(player);
+      console.log("Friend queue updated: ", friendQueue);
+      if (friendQueue.get(roomId)?.length === 2) {
+        const room = new Room(roomId);
+        const [player1, player2] = friendQueue.get(roomId) as Player[];
+        room.addPlayer(player1);
+        room.addPlayer(player2);
+        rooms.set(roomId, room);
+        io.sockets.sockets.get(player1.id)?.join(roomId);
+        io.sockets.sockets.get(player2.id)?.join(roomId);
+        friendQueue.delete(roomId);
+        console.log("Room created: ", room);
+      }
+      callback("success");
+    } else if (type === "random") {
+      randomQueue.push(player);
+      console.log("Random queue updated: ", randomQueue);
+      if (randomQueue.length >= 2) {
+        const player1 = randomQueue.shift() as Player;
+        const player2 = randomQueue.shift() as Player;
+        const roomId = createRoom(false);
+        const room = new Room(roomId);
+        room.addPlayer(player1);
+        room.addPlayer(player2);
+        rooms.set(roomId, room);
+        io.sockets.sockets.get(player1.id)?.join(roomId);
+        io.sockets.sockets.get(player2.id)?.join(roomId);
+        console.log("Room created: ", room);
+      }
+      callback("success");
     }
-    // Check if the room already has a p2 (second player)
-    if (rooms[roomId].p2) {
-      console.log("Room already has two players");
-      return socket.emit("roomJoinError", "Room is full.");
-    }
-    console.log("Player profile: ", playerProfile);
-    rooms[roomId].p2 = {
-      ...playerProfile,
-      move: null,
-      score: 0,
-      moveSet: false,
-    };
-
-    console.log("Join Rooms:");
-    console.log("p2 Info");
-    console.table(rooms[roomId].p2);
-    console.log("Rooms:", rooms);
-    console.table(rooms[roomId]);
-
-    socket.join(roomId);
-    socket.emit("roomJoined", roomId);
   });
 
-  socket.on("setUp", (roomId) => {
+  socket.on("clientReady", ({ socketId }) => {
+    // Trouver la salle à laquelle ce client appartient
+    console.log("Received clientReady event from:", socketId);
+
+    // Recherche dans les salles créées
+    let roomId;
+    for (let [id, room] of rooms.entries()) {
+      console.log(room, id);
+      if (
+        (room.p1 && room.p1.id === socketId) ||
+        (room.p2 && room.p2.id === socketId)
+      ) {
+        roomId = id;
+        break;
+      }
+    }
+
+    // Si le joueur n'est pas trouvé dans les salles créées, vérifiez la file d'attente
+    if (!roomId) {
+      console.log("Checking friendQueue...");
+      for (let [id, players] of friendQueue.entries()) {
+        console.log(players, id);
+        if (players.some((player) => player.id === socketId)) {
+          console.log("Player found in friendQueue:", id);
+          roomId = id;
+          break;
+        }
+      }
+    }
+
+    // Si le joueur n'est toujours pas trouvé, vérifiez la randomQueue
+    if (!roomId) {
+      console.log("Checking randomQueue...");
+      for (let player of randomQueue) {
+        console.log(player);
+        if (player.id === socketId) {
+          console.log("Player found in randomQueue");
+          player.isReady = true;
+          break;
+        }
+      }
+    }
+
+    if (!roomId) {
+      console.error("Client does not belong to any room or queue:", socketId);
+      return;
+    }
+
+    const room = rooms.get(roomId);
+    console.log("Room:", room);
+    console.log("Socket ID:", socketId);
+    // Marquer ce client comme prêt
+    if (!room) {
+      console.error("Room not found:", roomId);
+      return;
+    }
+
+    if (room.p1 && room.p1.id === socketId) {
+      room.p1.isReady = true;
+    } else if (room.p2 && room.p2.id === socketId) {
+      room.p2.isReady = true;
+    }
+
+    // Vérifier si tous les clients de cette salle sont prêts
+    if (room.p1 && room.p2 && room.p1.isReady && room.p2.isReady) {
+      io.to(roomId).emit("roomCreated", roomId);
+    }
+  });
+
+  socket.on("inGame", ({ roomId }) => {
     console.log("Room ID initial:", roomId);
-    console.table(rooms[roomId]);
-    rooms[roomId].displayStep = BOTH_PLAYERS_CONNECTED;
-    socket.broadcast.to(roomId).emit("isSetUp", rooms[roomId]);
-  });
-
-  socket.on("findRoom", (playerProfile) => {
-    const roomId = findAvailableRoom(rooms);
-    console.log("Find Rooms: " + roomId);
-    if (roomId) {
-      // Join the available room as p2
-      rooms[roomId].p2 = {
-        ...playerProfile,
-        move: null,
-        score: 0,
-        moveSet: false,
-      };
-
-      console.log("Find: Joining existing room:");
-      console.log("Room ID:", roomId);
-      console.table(rooms[roomId]);
-      console.log("p2 infos");
-      console.table(rooms[roomId].p2);
-
-      socket.join(roomId);
-      socket.emit("roomFound", roomId);
-      socket.emit("initialPlayer", [rooms[roomId].p1, rooms[roomId].p2]);
-    } else {
-      // Create a new room
-      const newRoomId = createRoom(false);
-      rooms[newRoomId] = {
-        p1: {
-          ...playerProfile,
-          move: null,
-          score: 0,
-          moveSet: false,
-        },
-        round: 1,
-        displayStep: WAITING_FOR_PLAYER,
-        isPrivate: false,
-        id: newRoomId,
-      };
-
-      console.log("Find: Creating new room:");
-      console.log("Room ID:", newRoomId);
-      console.table(rooms[newRoomId]);
-      console.log("p1 infos");
-      console.table(rooms[newRoomId].p1);
-
-      socket.join(newRoomId);
-      socket.emit("roomCreated", newRoomId);
-      socket.emit("initialPlayer", [rooms[newRoomId].p1]);
+    console.table(rooms);
+    const room = rooms.get(roomId);
+    console.table(room);
+    console.log(BOTH_PLAYERS_CONNECTED);
+    if (room) {
+      console.log("Room ready for emit");
+      console.table(room);
+      room.displayStep = BOTH_PLAYERS_CONNECTED;
+      socket.emit("isSetUp", room);
+      console.log("Room emited");
     }
   });
 
-  socket.on("joinRandom", (data) => {
-    const roomId = data.roomId;
-    rooms[roomId].displayStep = BOTH_PLAYERS_CONNECTED;
-    socket.broadcast.to(roomId).emit("isSetUp", rooms[roomId]);
-  });
-
-  socket.on("playerMove", (roomId, playerId, move) => {
+  socket.on("move", ({ roomId, playerId, move }) => {
     if (!isValidMove(move)) return socket.emit("invalidMove");
 
-    const room = rooms[roomId];
+    const room = rooms.get(roomId);
     let playerKey = null;
 
-    if (room.p1.id === playerId) {
-      playerKey = "p1";
-    } else if (room.p2 && room.p2.id === playerId) {
-      playerKey = "p2";
+    if (room) {
+      if (room.p1 && room.p1.id === playerId) {
+        playerKey = "p1";
+      } else if (room.p2 && room.p2.id === playerId) {
+        playerKey = "p2";
+      }
     }
 
     if (playerKey) {
@@ -238,18 +266,57 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("animationEnd", ({ roomId, result }) => {
+    const room = rooms.get(roomId);
+    if (room && room.p1 && room.p2) {
+      if (result !== "Tie") room.round += 1;
+
+      // Vérifiez si turn est égal à 3
+      if (room.round > 3) {
+        room.displayStep = FINAL_SCORE;
+      } else {
+        room.p1.move = null;
+        room.p1.moveSet = false;
+        room.p2.move = null;
+        room.p2.moveSet = false;
+        room.displayStep = BOTH_PLAYERS_CONNECTED; // Sinon, continuez comme avant
+      }
+
+      console.log("Room before reset:", room);
+      io.to(roomId).emit("updateRoom", room);
+      console.log("Room reset:", room);
+    }
+  });
+
+  socket.on("leaveRoom", ({ id, roomId }) => {
+    console.log("leaveRoom", id);
+    socket.leave(roomId); // Quitter la room, pas le joueur
+
+    // Trouver la room dans votre structure de données 'rooms'
+    const room = rooms.get(roomId);
+    if (room) {
+      if (room.p1 && room.p1.id === id) {
+        room.p1 = null;
+      } else if (room.p2 && room.p2.id === id) {
+        room.p2 = null;
+      }
+      if (!room.p1 && !room.p2) {
+        rooms.delete(roomId);
+      }
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected");
 
     for (const roomId in rooms) {
-      const room = rooms[roomId];
+      const room = rooms.get(roomId);
 
       // Si l'un des joueurs est le joueur déconnecté, mettez à jour displayStep
       if (
-        (room.p1 && room.p1.id === socket.id) ||
-        (room.p2 && room.p2.id === socket.id)
+        (room?.p1 && room.p1.id === socket.id) ||
+        (room?.p2 && room.p2.id === socket.id)
       ) {
-        room.displayStep = FINAL_SCORE;
       }
     }
   });

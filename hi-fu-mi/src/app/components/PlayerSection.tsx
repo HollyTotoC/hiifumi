@@ -1,10 +1,11 @@
 "use client";
-import { BsHeartFill, BsHeartbreak } from "react-icons/bs";
+import { BsStar } from "react-icons/bs";
+import Image from "next/image";
 
 interface PlayerSectionProps {
-    playerName: string;
-    playerAvatar: string;
-    playerScore: number;
+    playerName: string | undefined;
+    playerAvatar: number | undefined;
+    playerScore: number | undefined;
     isReversed: boolean;
     bgColor: string;
     border: string;
@@ -32,15 +33,17 @@ const PlayerSection = ({
                 {playerName}
             </p>
 
-            {Array.from({ length: playerScore }).map((_, index) => (
-                <BsHeartFill
-                    key={`life${index}`}
-                    className="text-2xl text-red-600"
-                />
+            {Array.from({ length: playerScore || 0 }).map((_, index) => (
+                <BsStar key={`life${index}`} className="text-2xl text-black" />
             ))}
-            <p className="rounded-full border-2 border-black bg-white p-1 text-2xl">
-                {playerAvatar}
-            </p>
+            <div className="rounded-full border-2 border-black bg-white p-1 text-2xl">
+                <Image
+                    src={`/avatar/${playerAvatar}.svg`}
+                    alt={`Avatar ${playerAvatar}`}
+                    width={30}
+                    height={30}
+                />
+            </div>
         </section>
     );
 };

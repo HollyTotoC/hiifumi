@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 interface ButtonProps {
     content: string;
     type?: "button" | "submit" | "reset" | undefined;
-    onClick: () => void;
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const Button = ({ content, onClick, type }: ButtonProps) => {

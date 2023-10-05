@@ -66,6 +66,10 @@ const config: Config = {
                     "0%, 100%": { transform: "scale(0)" },
                     "15%, 85%": { transform: "scale(1)" },
                 },
+                finalScore: {
+                    "0%": { transform: "scale(0)" },
+                    "100%": { transform: "scale(1)" },
+                },
             },
             animation: {
                 customFadeOut: "customFadeOut 700ms forwards",
@@ -77,6 +81,7 @@ const config: Config = {
                 slideInFromLeft: "slideInFromLeft 5s ease-in-out forwards",
                 slideInFromRight: "slideInFromRight 5s ease-in-out forwards",
                 scoreDisplay: "scoreDisplay 5s ease-in-out forwards",
+                finalScore: "finalScore 2s ease-in-out forwards",
             },
         },
     },

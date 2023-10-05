@@ -3,16 +3,23 @@
 import React from "react";
 import Loading from "./Loading";
 
-const MoveSection = ({ playerId, handleMoveSelection }) => {
+interface MoveSectionProps {
+    playerId: string | null;
+    handleMoveSelection: (playerId: string, move: string) => void;
+}
+
+const MoveSection = ({ playerId, handleMoveSelection }: MoveSectionProps) => {
     const moveChoices = ["🪨", "📃", "✂️"];
 
-    const onMoveChange = (event) => {
-        handleMoveSelection(playerId, event.target.value);
+    const onMoveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (playerId) {
+            handleMoveSelection(playerId, e.target.value);
+        }
     };
 
     return (
         <div className="relative z-50 flex flex-col items-center justify-center gap-10">
-            <Loading textContent="Waiting for a player move" />
+            <Loading textContent="Waiting for opponent move" />
             <div className="relative w-2/3">
                 <div className="flex flex-col items-center h-fit gap-1 p-4 px-2 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
                     <p className="text-xl font-bold mb-6">Select your move</p>

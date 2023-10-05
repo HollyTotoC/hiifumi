@@ -4,122 +4,153 @@ import React from "react";
 import Loading from "../../components/Loading";
 import PlayerSection from "../../components/PlayerSection";
 import MoveSection from "../../components/MoveSection";
+import FinalScore from "../../components/FinalScore";
 import { RenderMove } from "../../components/RenderMove";
 import { useState, useEffect } from "react";
 import { useSocket } from "../../utils/socketContext";
 import { usePathname, useSearchParams } from "next/navigation";
-
-type PlayerType = {
-    id?: string;
-    name?: string;
-    avatar?: string;
-    move?: string | null;
-    score?: number;
-    moveSet?: boolean;
-};
-
-type RoomType = {
-    p1?: PlayerType;
-    p2?: PlayerType;
-    round?: number;
-    displayStep?: number;
-    isPrivate?: boolean;
-    id?: string;
-};
+import { PlayerType, RoomType } from "../../types";
 
 const Game = () => {
     const socket = useSocket();
     const searchPathName = usePathname();
     const searchParams = useSearchParams();
     const roomId = searchPathName.replace("/game/", "");
-    const playerUrlId = searchParams.get("lpi");
-    const playerRandom = searchParams.get("rdm");
-    const isInvited = searchParams.get("invite");
+    //lpi = localPlayerId
+    const lpi = searchParams.get("lpi");
 
     const [localPlayer, setLocalPlayer] = useState<PlayerType>({});
     const [remotePlayer, setRemotePlayer] = useState<PlayerType>({});
     const [room, setRoom] = useState<RoomType>({});
-    const playerId = localPlayer?.id || "";
     const turn = room?.displayStep || 0;
+    const [result, setResult] = useState<string>("");
+
+    const setPlayers = (updateRoom: RoomType, lpi: string | null) => {
+        if (updateRoom.p1 && updateRoom.p2) {
+            if (updateRoom.p1.id === lpi) {
+                setLocalPlayer(updateRoom.p1);
+                setRemotePlayer(updateRoom.p2);
+            } else if (updateRoom.p2.id === lpi) {
+                setLocalPlayer(updateRoom.p2);
+                setRemotePlayer(updateRoom.p1);
+            }
+        }
+    };
 
     useEffect(() => {
-        console.log("roomId", roomId);
-        console.log("isInvited ?", isInvited);
+        console.log("socket", socket, "lpi", lpi, "roomId", roomId);
         if (!socket || !roomId) {
             alert("Someting went wrong, please try again later 'error code 1'");
         }
-
-        if (isInvited) {
-            //trigger joinFriend to get full room and set p2
-            socket?.emit("setUp", roomId);
-            socket?.on("isSetUp", (data) => {
-                console.log("isSetUp", data);
-                setLocalPlayer(data.p1);
-                setRemotePlayer(data.p2);
-                setRoom(data);
-                console.log("isSetUpDone", data);
-            });
-        } else if (playerRandom) {
-            //trigger findRoom to find available room or set one
-            socket?.emit("joinRandom", { roomId });
-            socket?.on("isSetup", (data) => {
-                setLocalPlayer(data.p1);
-                setRemotePlayer(data.p2);
-                setRoom(data);
-            });
-        } else if (socket && roomId && !isInvited && !playerRandom) {
-            console.log("the good stuff", roomId);
-            socket.emit("getInitialState", roomId);
-            socket.on("initialState", (data) => {
-                setLocalPlayer(data.p1);
-                setRoom(data);
+        if (socket && lpi && roomId) {
+            socket.emit("inGame", { roomId });
+            socket.on("isSetUp", (updateRoom: RoomType) => {
+                console.log("isSetUp", updateRoom);
+                setRoom(updateRoom);
+                setPlayers(updateRoom, lpi);
             });
         } else {
             alert("Someting went wrong, please try again later 'error code 2'");
         }
-    }, [socket, roomId, isInvited, playerRandom]);
+
+        return () => {
+            socket?.off("updateRoom");
+        };
+    }, [socket, roomId, lpi]);
+
+    useEffect(() => {
+        console.log("1");
+        if (socket && roomId) {
+            console.log("2");
+            socket.on("updateRoom", (updateRoom) => {
+                console.log("3");
+                if ("result" in updateRoom) {
+                    console.log("4");
+                    console.log("Result:", updateRoom.result);
+                    setRoom(updateRoom.room);
+                    setPlayers(updateRoom, lpi);
+                    setResult(updateRoom.result);
+                    console.log("5");
+                } else {
+                    console.log("6");
+                    console.log("updateRoom", updateRoom);
+                    console.log(room);
+                    setRoom(updateRoom);
+                    setPlayers(updateRoom, lpi);
+                    console.log(room);
+                }
+            });
+        }
+        return () => {
+            console.log("off");
+            socket?.off("updateRoom");
+        };
+    }, [socket, roomId, lpi, room]);
+
+    useEffect(() => {
+        console.log("useEffect animation", room);
+        console.log("turn", turn);
+        console.log("result", result);
+
+        const handleAnimationEnd = () => {
+            if (socket && roomId && result) {
+                socket.emit("animationEnd", { roomId, result });
+            }
+        };
+        if (turn === 2) {
+            // Supposons que l'animation démarre immédiatement après que turn passe à 3
+            const timerId = setTimeout(handleAnimationEnd, 5500); // Ajustez le temps en conséquence
+
+            return () => clearTimeout(timerId); // Nettoyez le timer pour éviter les fuites de mémoire
+        }
+    }, [turn, socket, roomId, result, room]);
 
     useEffect(() => {
         console.log("useEffect");
         console.table({
-            roomId,
-            socket,
             localPlayer,
             remotePlayer,
             room,
-            isInvited,
-            playerRandom,
+            turn,
         });
-    }, [
-        socket,
-        roomId,
-        localPlayer,
-        remotePlayer,
-        room,
-        isInvited,
-        playerRandom,
-    ]);
+    }, [localPlayer, remotePlayer, room, turn]);
 
-    const handleMoveSelection = (playerId, move) => {};
+    const handleMoveSelection = (playerId: string, move: string) => {
+        console.log("handleMoveSelection", playerId, move);
+        if (socket) {
+            socket.emit("move", { roomId, playerId, move });
+        }
+    };
 
     let gameConntent;
     switch (turn) {
-        case 0:
-            gameConntent = <Loading textContent="Waiting for a player" />;
-            break;
         case 1:
-            gameConntent = (
+            console.log("turn 1", turn);
+            gameConntent = lpi ? (
                 <MoveSection
-                    playerId={playerId}
+                    playerId={lpi}
                     handleMoveSelection={handleMoveSelection}
+                />
+            ) : null;
+            break;
+        case 2:
+            console.log("turn 2", turn);
+            gameConntent = (
+                <RenderMove
+                    localPlayer={localPlayer}
+                    remotePlayer={remotePlayer}
                 />
             );
             break;
-        case 2:
-            gameConntent = <RenderMove players={room} />;
-            break;
         case 3:
-            gameConntent = <p>Winner / Loser</p>;
+            console.log("turn 3", turn);
+            gameConntent = (
+                <FinalScore
+                    localPlayer={localPlayer}
+                    remotePlayer={remotePlayer}
+                    room={room}
+                />
+            );
             break;
         default:
             gameConntent = <p>error</p>;
@@ -140,7 +171,7 @@ const Game = () => {
             </section>
             <PlayerSection
                 playerName={localPlayer?.name}
-                playerSives={localPlayer?.score}
+                playerScore={localPlayer?.score}
                 playerAvatar={localPlayer?.avatar}
                 isReversed={true}
                 bgColor={"orange-300"}
