@@ -81,8 +81,6 @@ const handlePlayerMove = (
       room.p2.moveSet = true;
     }
     console.log(`Player ${playerKey} in Room ${roomId}:`);
-    console.table(room[playerKey]);
-    console.log("Room:", room);
 
     if (room.p1 && room.p1.moveSet && room.p2 && room.p2.moveSet) {
       const result = determineWinner(room.p1.move!, room.p2.move!);
@@ -103,16 +101,13 @@ const handlePlayerMove = (
       console.log(`Player 2 Score: ${room.p2.score}`);
 
       room.displayStep = SHOW_RESULT;
-      console.log("Room before result:", room);
       io.to(roomId).emit("updateRoom", { room, result: result });
     }
   }
-  console.log("Room before refresh:", room);
   io.to(roomId).emit("updateRoom", room);
 };
 
 io.on("connection", (socket) => {
-  console.log("Rooms:", rooms);
   console.log("A user connected");
 
   socket.on("createRoom", (data, callback) => {
@@ -212,8 +207,6 @@ io.on("connection", (socket) => {
     }
 
     const room = rooms.get(roomId);
-    console.log("Room:", room);
-    console.log("Socket ID:", socketId);
     // Marquer ce client comme prêt
     if (!room) {
       console.error("Room not found:", roomId);
@@ -234,7 +227,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("inGame", ({ roomId }) => {
-    console.log("Room ID initial:", roomId);
     console.table(rooms);
     const room = rooms.get(roomId);
     console.table(room);
@@ -283,9 +275,7 @@ io.on("connection", (socket) => {
         room.displayStep = BOTH_PLAYERS_CONNECTED; // Sinon, continuez comme avant
       }
 
-      console.log("Room before reset:", room);
       io.to(roomId).emit("updateRoom", room);
-      console.log("Room reset:", room);
     }
   });
 

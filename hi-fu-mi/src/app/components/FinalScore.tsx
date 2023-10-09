@@ -17,7 +17,7 @@ const FinalScore = ({ remotePlayer, localPlayer, room }: FinalScoreProps) => {
     const lpi = localPlayer.id;
     const roomId = room.id;
     const handleClick = () => {
-        router.push("/"); // 3. Redirigez l'utilisateur vers la page d'accueil
+        router.push("/");
         socket?.emit("leaveRoom", { id: lpi, roomId: roomId });
     };
     return (

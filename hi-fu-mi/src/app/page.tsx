@@ -18,28 +18,13 @@ export default function Home() {
     const [isDelayed, setIsDelayed] = useState(false);
 
     useEffect(() => {
-        console.table({
-            isActive,
-            isSet,
-            playerName,
-            playerAvatar,
-            socket,
-            urlRoomId,
-        });
-    }, [isActive, isSet, playerName, playerAvatar, socket, urlRoomId]);
-
-    useEffect(() => {
         if (isActive) {
             const timerId = setTimeout(() => {
                 setIsDelayed(true);
-                console.log("timerId", timerId);
-            }, 500); // delay de 500ms
+            }, 500);
 
-            // Cleanup : annule le timer si le composant est démonté avant que le délai ne soit écoulé
             return () => clearTimeout(timerId);
-        }
-        // Reset isDelayed si isActive change à false
-        else {
+        } else {
             setIsDelayed(false);
         }
     }, [isActive]);
@@ -57,7 +42,6 @@ export default function Home() {
     };
 
     const playWithFriend = () => {
-        alert("Entering playWithFriend");
         const generateRoomId = Math.random().toString(36).substr(2, 9);
         const data = {
             type: "friend",
@@ -255,7 +239,7 @@ export default function Home() {
                     />
                 </form>
             </section>
-            <section className="relative h-[100vh] w-screen flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
+            <main className="relative h-[100vh] w-screen flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
                 <div className="flex flex-col px-10 mt-auto mb-auto gap-16">
                     <div className="flex flex-col items-center gap-3 mb-3">
                         <Image
@@ -284,7 +268,7 @@ export default function Home() {
                         />
                     </div>
                 </div>
-            </section>
+            </main>
         </>
     );
 }

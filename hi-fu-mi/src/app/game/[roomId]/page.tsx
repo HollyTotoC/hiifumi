@@ -16,7 +16,6 @@ const Game = () => {
     const searchPathName = usePathname();
     const searchParams = useSearchParams();
     const roomId = searchPathName.replace("/game/", "");
-    //lpi = localPlayerId
     const lpi = searchParams.get("lpi");
 
     const [localPlayer, setLocalPlayer] = useState<PlayerType>({});
@@ -38,14 +37,12 @@ const Game = () => {
     };
 
     useEffect(() => {
-        console.log("socket", socket, "lpi", lpi, "roomId", roomId);
         if (!socket || !roomId) {
             alert("Someting went wrong, please try again later 'error code 1'");
         }
         if (socket && lpi && roomId) {
             socket.emit("inGame", { roomId });
             socket.on("isSetUp", (updateRoom: RoomType) => {
-                console.log("isSetUp", updateRoom);
                 setRoom(updateRoom);
                 setPlayers(updateRoom, lpi);
             });
@@ -59,38 +56,25 @@ const Game = () => {
     }, [socket, roomId, lpi]);
 
     useEffect(() => {
-        console.log("1");
         if (socket && roomId) {
-            console.log("2");
             socket.on("updateRoom", (updateRoom) => {
-                console.log("3");
                 if ("result" in updateRoom) {
-                    console.log("4");
-                    console.log("Result:", updateRoom.result);
                     setRoom(updateRoom.room);
                     setPlayers(updateRoom, lpi);
                     setResult(updateRoom.result);
-                    console.log("5");
                 } else {
-                    console.log("6");
-                    console.log("updateRoom", updateRoom);
-                    console.log(room);
                     setRoom(updateRoom);
                     setPlayers(updateRoom, lpi);
-                    console.log(room);
                 }
             });
         }
         return () => {
-            console.log("off");
             socket?.off("updateRoom");
         };
     }, [socket, roomId, lpi, room]);
 
     useEffect(() => {
-        console.log("useEffect animation", room);
-        console.log("turn", turn);
-        console.log("result", result);
+        // console.info("turn", turn);
 
         const handleAnimationEnd = () => {
             if (socket && roomId && result) {
@@ -98,25 +82,13 @@ const Game = () => {
             }
         };
         if (turn === 2) {
-            // Supposons que l'animation démarre immédiatement après que turn passe à 3
-            const timerId = setTimeout(handleAnimationEnd, 5500); // Ajustez le temps en conséquence
+            const timerId = setTimeout(handleAnimationEnd, 5500);
 
-            return () => clearTimeout(timerId); // Nettoyez le timer pour éviter les fuites de mémoire
+            return () => clearTimeout(timerId);
         }
     }, [turn, socket, roomId, result, room]);
 
-    useEffect(() => {
-        console.log("useEffect");
-        console.table({
-            localPlayer,
-            remotePlayer,
-            room,
-            turn,
-        });
-    }, [localPlayer, remotePlayer, room, turn]);
-
     const handleMoveSelection = (playerId: string, move: string) => {
-        console.log("handleMoveSelection", playerId, move);
         if (socket) {
             socket.emit("move", { roomId, playerId, move });
         }
@@ -125,7 +97,6 @@ const Game = () => {
     let gameConntent;
     switch (turn) {
         case 1:
-            console.log("turn 1", turn);
             gameConntent = lpi ? (
                 <MoveSection
                     playerId={lpi}
@@ -134,7 +105,6 @@ const Game = () => {
             ) : null;
             break;
         case 2:
-            console.log("turn 2", turn);
             gameConntent = (
                 <RenderMove
                     localPlayer={localPlayer}
@@ -143,7 +113,6 @@ const Game = () => {
             );
             break;
         case 3:
-            console.log("turn 3", turn);
             gameConntent = (
                 <FinalScore
                     localPlayer={localPlayer}
