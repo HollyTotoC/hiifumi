@@ -166,7 +166,7 @@ const Game = () => {
                 bgColor={"violet-300"}
                 border={"b"}
             />
-            <section className="flex items-center justify-center grow">
+            <section className="flex items-center justify-center grow overflow-hidden">
                 {gameConntent}
             </section>
             <PlayerSection

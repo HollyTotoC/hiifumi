@@ -1,26 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSocket } from "../../utils/socketContext";
 import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { BsCircleFill } from "react-icons/bs";
 
 const Waiting = () => {
     const router = useRouter();
     const socket = useSocket();
+    const invite = useSearchParams().get("invite");
     const socketId = usePathname().replace("/waiting/", "");
     const circleData = [
         { color: "text-blue-300", animation: "animate-scalePulse-0" },
         { color: "text-pink-300", animation: "animate-scalePulse-500" },
         { color: "text-yellow-300", animation: "animate-scalePulse-1000" },
     ];
+    const [inviteId, setInviteId] = useState(null);
 
     useEffect(() => {
         if (socketId) {
             // Émettre un événement au serveur pour indiquer que ce client est prêt
             socket?.emit("clientReady", { socketId });
+            socket?.on("roomId", (roomId) => {
+                setInviteId(roomId);
+            });
 
             // Écouter l'événement 'roomCreated' pour la redirection
             socket?.on("roomCreated", (roomId: string) => {
@@ -32,12 +37,26 @@ const Waiting = () => {
         return () => {
             socket?.off("roomCreated");
         };
-    }, [socketId, router, socket]);
+    }, [socketId, router, socket, invite]);
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                console.log("Text copied to clipboard");
+            })
+            .catch((err) => {
+                console.error("Error in copying text: ", err);
+            });
+    };
+
+    console.log("inviteId", inviteId);
+    console.log("invite", invite);
 
     return (
         <div className="h-screen w-screen flex justify-center items-center">
             <div className="relative w-3/5">
-                <div className="flex flex-col items-center h-fit gap-2 p-4 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
+                <div className="flex flex-col items-center h-fit gap-6 px-4 py-10 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
                     <p className="text-xl font-bold">
                         Waiting for someone to join. Be patient 😉
                     </p>
@@ -50,6 +69,19 @@ const Waiting = () => {
                             </React.Fragment>
                         ))}
                     </div>
+                    <p
+                        className={`p-2 border-2 border-black cursor-pointer ${
+                            invite === null ? "hidden" : ""
+                        }`}
+                        onClick={() => {
+                            if (invite !== null) {
+                                const text = `${window.location.origin}/?rid=${invite}`;
+                                copyToClipboard(text);
+                            }
+                        }}
+                    >
+                        {window.location.origin}/?rid=${invite}
+                    </p>
                 </div>
                 <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-pink-300 rounded-sm z-[3] translate-x-0 translate-y-0"></span>
                 <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-yellow-300 rounded-sm z-[2] translate-x-2 translate-y-2"></span>

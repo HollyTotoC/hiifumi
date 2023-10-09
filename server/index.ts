@@ -138,6 +138,9 @@ io.on("connection", (socket) => {
         io.sockets.sockets.get(player1.id)?.join(roomId);
         io.sockets.sockets.get(player2.id)?.join(roomId);
         friendQueue.delete(roomId);
+        if (room.p1) {
+          room.p1.isReady = true;
+        }
         console.log("Room created: ", room);
       }
       callback("success");
@@ -219,6 +222,7 @@ io.on("connection", (socket) => {
 
     if (room.p1 && room.p1.id === socketId) {
       room.p1.isReady = true;
+      io.to(socketId).emit("roomId", roomId);
     } else if (room.p2 && room.p2.id === socketId) {
       room.p2.isReady = true;
     }
@@ -269,7 +273,7 @@ io.on("connection", (socket) => {
       if (result !== "Tie") room.round += 1;
 
       // Vérifiez si turn est égal à 3
-      if (room.round > 3) {
+      if (room.round >= 6) {
         room.displayStep = FINAL_SCORE;
       } else {
         room.p1.move = null;

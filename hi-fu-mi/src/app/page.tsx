@@ -9,7 +9,7 @@ import Image from "next/image";
 export default function Home() {
     const router = useRouter();
     const socket = useSocket();
-    const urlRoomId = useSearchParams().get("rid")?.replace("?rid=", "");
+    const urlRoomId = useSearchParams().get("rid");
 
     const [isActive, setIsActive] = useState(true);
     const [isSet, setIsSet] = useState(false);
@@ -24,8 +24,9 @@ export default function Home() {
             playerName,
             playerAvatar,
             socket,
+            urlRoomId,
         });
-    }, [isActive, isSet, playerName, playerAvatar, socket]);
+    }, [isActive, isSet, playerName, playerAvatar, socket, urlRoomId]);
 
     useEffect(() => {
         if (isActive) {
@@ -45,7 +46,9 @@ export default function Home() {
 
     const handleCreateRoom = (data: any) => {
         socket?.emit("createRoom", data, (ack: string) => {
-            if (ack === "success") {
+            if (ack === "success" && data.type === "friend") {
+                router.push(`/waiting/${socket?.id}?invite=${data.roomId}`);
+            } else if (ack === "success") {
                 router.push(`/waiting/${socket?.id}`);
             } else {
                 alert("Room not found");
