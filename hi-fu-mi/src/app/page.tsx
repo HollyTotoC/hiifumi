@@ -15,6 +15,7 @@ export default function Home() {
     const [isSet, setIsSet] = useState(false);
     const [playerName, setPlayerName] = useState("");
     const [playerAvatar, setPlayerAvatar] = useState<number | null>(null);
+    const [isDelayed, setIsDelayed] = useState(false);
 
     useEffect(() => {
         console.table({
@@ -25,6 +26,22 @@ export default function Home() {
             socket,
         });
     }, [isActive, isSet, playerName, playerAvatar, socket]);
+
+    useEffect(() => {
+        if (isActive) {
+            const timerId = setTimeout(() => {
+                setIsDelayed(true);
+                console.log("timerId", timerId);
+            }, 500); // delay de 500ms
+
+            // Cleanup : annule le timer si le composant est démonté avant que le délai ne soit écoulé
+            return () => clearTimeout(timerId);
+        }
+        // Reset isDelayed si isActive change à false
+        else {
+            setIsDelayed(false);
+        }
+    }, [isActive]);
 
     const handleCreateRoom = (data: any) => {
         socket?.emit("createRoom", data, (ack: string) => {
@@ -88,6 +105,10 @@ export default function Home() {
         }
     };
 
+    function handleImageClick() {
+        setIsSet(false);
+    }
+
     return (
         <>
             <header
@@ -97,48 +118,66 @@ export default function Home() {
                         : "animate-customBorder"
                 }`}
             >
-                <div className={`flex flex-col text-center items-center gap-4`}>
-                    <h1
-                        className={`font-bold transition-all duration-700 delay-700 ${
-                            isActive ? "text-6xl" : "text-2xl"
+                {!isActive ? (
+                    <div
+                        className={`flex flex-row justify-between w-full opacity-0 ${
+                            !isDelayed ? "animate-customFadeIn" : ""
                         }`}
                     >
-                        <span
-                            className={`text-2xl transition-all duration-700 ${
-                                isActive
-                                    ? " opacity-100"
-                                    : "animate-customFadeOut"
-                            }`}
+                        <a href="" className="self-center">
+                            <h1 className={`font-bold text-2xl`}>
+                                <span className="text-pink-300">Hi</span>
+                                <span className="text-yellow-300">Fu</span>
+                                <span className="text-teal-600">Mi</span>
+                            </h1>
+                        </a>
+
+                        {isSet ? (
+                            <div
+                                className="rounded-full border-2 border-black bg-white p-1 text-2xl cursor-pointer opacity-0 animate-customFadeIn"
+                                onClick={handleImageClick}
+                            >
+                                <Image
+                                    src={`/avatar/${playerAvatar}.svg`}
+                                    alt={`Avatar ${playerAvatar}`}
+                                    width={30}
+                                    height={30}
+                                />
+                            </div>
+                        ) : null}
+                    </div>
+                ) : (
+                    <>
+                        <div
+                            className={`flex flex-col text-center items-center gap-4`}
                         >
-                            Welcome to
-                            <br />
-                        </span>
-                        <span className="text-pink-300">Hi</span>
-                        <span className="text-yellow-300">Fu</span>
-                        <span className="text-teal-600">Mi</span>
-                    </h1>
-                    <p
-                        className={`text-2xl transition-all  duration-700 ${
-                            isActive ? "opacity-100" : "animate-customFadeOut"
-                        }`}
-                    >
-                        Here you can challenge your friends or strangers in a
-                        hi&#8209;fu&#8209;mi game.
-                    </p>
-                </div>
-                <div
-                    className={`transition-all duration-700 delay-100 mt-16 ${
-                        isActive ? "opacity-100" : "animate-customFadeOut"
-                    }`}
-                >
-                    <Button
-                        content="Let's&nbsp;go&nbsp;!"
-                        onClick={handleButtonClick}
-                    />
-                </div>
+                            <h1 className={`font-bold text-6xl`}>
+                                <span className={`text-2xl`}>
+                                    Welcome to
+                                    <br />
+                                </span>
+                                <span className="text-pink-300">Hi</span>
+                                <span className="text-yellow-300">Fu</span>
+                                <span className="text-teal-600">Mi</span>
+                            </h1>
+                            <p
+                                className={`text-2xl transition-all  duration-700`}
+                            >
+                                Here you can challenge your friends or strangers
+                                in a hi&#8209;fu&#8209;mi game.
+                            </p>
+                        </div>
+                        <div className={`mt-16`}>
+                            <Button
+                                content="Let's&nbsp;go&nbsp;!"
+                                onClick={handleButtonClick}
+                            />
+                        </div>
+                    </>
+                )}
             </header>
             <section
-                className={`absolute left-0 right-0 h-[100vh] w-screen flex flex-col items-center justify-start z-10 grow pt-[50px] bg-green-300 transition-all duration-700 ${
+                className={`absolute top left-0 right-0 h-[100vh] w-screen flex flex-col items-center justify-start z-10 grow pt-[50px] bg-green-300 transition-all duration-700 ${
                     !isSet ? "top-0" : "top-[-100%]"
                 }`}
             >
@@ -179,7 +218,7 @@ export default function Home() {
                                         key={num}
                                         className={`p-1 rounded-full bg-white border-2 border-white hover:border-black transition-all duration-300 ${
                                             playerAvatar == num
-                                                ? "border-black"
+                                                ? "!border-black"
                                                 : ""
                                         }`}
                                     >

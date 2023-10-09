@@ -1,9 +1,10 @@
-const VALID_MOVES = ["🪨", "📃", "✂️"];
-
+// Check if a move is valid
 function isValidMove(move: string) {
-  return VALID_MOVES.includes(move);
+  const validMoves = ["🪨", "📃", "✂️"];
+  return validMoves.includes(move);
 }
 
+// Determine winner
 function determineWinner(moveA: string, moveB: string): "A" | "B" | "Tie" {
   // If both moves are the same, it's a tie
   if (moveA === moveB) {

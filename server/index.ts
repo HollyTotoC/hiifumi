@@ -1,3 +1,5 @@
+import { instrument } from "@socket.io/admin-ui";
+
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
@@ -15,7 +17,7 @@ console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://admin.socket.io"],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
@@ -62,11 +64,6 @@ class Room {
 const rooms: Map<string, Room> = new Map();
 const randomQueue: Player[] = [];
 const friendQueue: Map<string, Player[]> = new Map();
-
-// const updateDisplayStep = (roomId: string, step: number) => {
-//   rooms[roomId].displayStep = step;
-//   io.to(roomId).emit("updateDisplayStep", rooms[roomId].displayStep);
-// };
 
 const handlePlayerMove = (
   roomId: string,
@@ -320,6 +317,11 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
+
+instrument(io, {
+  auth: false,
+  mode: "development",
 });
 
 const PORT = 3001;

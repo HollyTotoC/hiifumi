@@ -14,15 +14,9 @@ const config: Config = {
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
             },
             keyframes: {
-                customFadeOut: {
-                    "0%": { opacity: "1" },
-                    "99%": { opacity: "0" },
-                    "100%": { opacity: "0", display: "none" },
-                },
-                customFlex: {
-                    "0%": { flex: "col" },
-                    "99%": { flex: "col" },
-                    "100%": { flex: "row" },
+                customFadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
                 },
                 customBorder: {
                     "0%": {
@@ -72,9 +66,8 @@ const config: Config = {
                 },
             },
             animation: {
-                customFadeOut: "customFadeOut 700ms forwards",
-                customFlex: "customFadeOut 700ms forwards",
-                customBorder: "customBorder 1400ms forwards",
+                customFadeIn: "customFadeIn 500ms 500ms forwards",
+                customBorder: "customBorder 500ms forwards",
                 "scalePulse-0": "scalePulse 3s infinite",
                 "scalePulse-500": "scalePulse 3s 0.3s infinite",
                 "scalePulse-1000": "scalePulse 3s 0.6s infinite",
