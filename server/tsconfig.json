@@ -9,8 +9,9 @@
         "strict": true,
         "skipLibCheck": true,
         "moduleResolution": "node",
-        "baseUrl": "./",
-        "preserveSymlinks": true
+        "baseUrl": "../",
+        "preserveSymlinks": true,
+        "noImplicitAny": true
     },
     "include": ["./**/*"],
     "exclude": ["node_modules"]

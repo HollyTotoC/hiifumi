@@ -113,10 +113,43 @@ const handlePlayerMove = (
   io.to(roomId).emit("updateRoom", room);
 };
 
+interface ClientReadyData {
+  socketId: string;
+}
+
+interface CreateRoomData {
+  roomId: string;
+  player: Player;
+  type: string;
+}
+
+interface CallbackData {
+  (data: string): void;
+}
+interface RoomReady {
+  roomId: string;
+}
+
+interface MoveData {
+  roomId: string;
+  playerId: string;
+  move: string;
+}
+
+interface AnimationEndData {
+  roomId: string;
+  result: string;
+}
+
+interface LeaveRoomData {
+  id: string;
+  roomId: string;
+}
+
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("createRoom", (data, callback) => {
+  socket.on("createRoom", (data: CreateRoomData, callback: CallbackData) => {
     console.log("Creating room...");
     console.table(data);
     const roomId = data.roomId;
@@ -164,7 +197,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("clientReady", ({ socketId }) => {
+  socket.on("clientReady", ({ socketId }: ClientReadyData) => {
     // Trouver la salle à laquelle ce client appartient
     console.log("Received clientReady event from:", socketId);
 
@@ -232,7 +265,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("inGame", ({ roomId }) => {
+  socket.on("inGame", ({ roomId }: RoomReady) => {
     console.table(rooms);
     const room = rooms.get(roomId);
     console.table(room);
@@ -246,7 +279,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("move", ({ roomId, playerId, move }) => {
+  socket.on("move", ({ roomId, playerId, move }: MoveData) => {
     if (!isValidMove(move)) return socket.emit("invalidMove");
 
     const room = rooms.get(roomId);
@@ -265,7 +298,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("animationEnd", ({ roomId, result }) => {
+  socket.on("animationEnd", ({ roomId, result }: AnimationEndData) => {
     const room = rooms.get(roomId);
     if (room && room.p1 && room.p2) {
       if (result !== "Tie") room.round += 1;
@@ -285,7 +318,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("leaveRoom", ({ id, roomId }) => {
+  socket.on("leaveRoom", ({ id, roomId }: LeaveRoomData) => {
     console.log("leaveRoom", id);
     socket.leave(roomId); // Quitter la room, pas le joueur
 

@@ -419,6 +419,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/dotenv@npm:latest":
+  version: 8.2.0
+  resolution: "@types/dotenv@npm:8.2.0"
+  dependencies:
+    dotenv: "*"
+  checksum: a1f524da7dc18b09bdb6c2613b9abbbe8ca575621cce4625efc7f98daf2ba07c7dbab622c9bb394507a12c5c515f9cbbbba4aeec17b801c88faeb8e8e656d460
+  languageName: node
+  linkType: hard
+
 "@types/express-serve-static-core@npm:^4.17.33":
   version: 4.17.37
   resolution: "@types/express-serve-static-core@npm:4.17.37"
@@ -509,22 +518,22 @@ __metadata:
   linkType: hard
 
 "@types/react-dom@npm:latest":
-  version: 18.2.12
-  resolution: "@types/react-dom@npm:18.2.12"
+  version: 18.2.13
+  resolution: "@types/react-dom@npm:18.2.13"
   dependencies:
     "@types/react": "*"
-  checksum: 64eaf808e91c1d58270ea92dda0e0cbb671f7289be4a5a4e0ccbd85857dd69394970eaa403d958dfbca739735c0af9cde4cf8fe135ff34434838360beae8d306
+  checksum: 22ba066b141dca5a5a9227fae0afc7c94b470fff8e8a38ade72649da57a8ea04d0cb2ba3e22005e7d8e772d49bddd28855b1dd98e6defd033bba6afb6edff883
   languageName: node
   linkType: hard
 
 "@types/react@npm:*, @types/react@npm:latest":
-  version: 18.2.27
-  resolution: "@types/react@npm:18.2.27"
+  version: 18.2.28
+  resolution: "@types/react@npm:18.2.28"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: bb29779d4e83e30886a4a939b02812a7ae2d49a26e19eb4be48a6d4e73e8b09ca1a639c97c0ba12a7fe46711355059db7f958cbc1754fe697690656cdb9eca07
+  checksum: 81381bedeba83278f4c9febb0b83e0bd3f42a25897a50b9cb36ef53651d34b3d50f87ebf11211ea57ea575131f85d31e93e496ce46478a00b0f9bf7b26b5917a
   languageName: node
   linkType: hard
 
@@ -563,7 +572,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/socket.io@npm:^3.0.2":
+"@types/socket.io@npm:latest":
   version: 3.0.2
   resolution: "@types/socket.io@npm:3.0.2"
   dependencies:
@@ -1609,7 +1618,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:latest":
+"dotenv@npm:*, dotenv@npm:latest":
   version: 16.3.1
   resolution: "dotenv@npm:16.3.1"
   checksum: 15d75e7279018f4bafd0ee9706593dd14455ddb71b3bcba9c52574460b7ccaf67d5cf8b2c08a5af1a9da6db36c956a04a1192b101ee102a3e0cf8817bbcf3dfd
@@ -4678,9 +4687,10 @@ __metadata:
   resolution: "server@workspace:server"
   dependencies:
     "@socket.io/admin-ui": latest
+    "@types/dotenv": latest
     "@types/express": latest
     "@types/node": latest
-    "@types/socket.io": ^3.0.2
+    "@types/socket.io": latest
     "@typescript-eslint/eslint-plugin": latest
     "@typescript-eslint/parser": latest
     cors: latest
