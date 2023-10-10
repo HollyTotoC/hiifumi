@@ -10,6 +10,6 @@
     "dev": "concurrently \"yarn hi-fu-mi\" \"yarn server\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "concurrently": "latest"
   }
 }
