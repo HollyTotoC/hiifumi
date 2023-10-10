@@ -32,6 +32,25 @@ export default function Home() {
         }
     }, [isActive]);
 
+    console.log(playerName, playerAvatar, isActive, isSet);
+
+    useEffect(() => {
+        // Récupération des données du localStorage
+        const storedPlayerData = localStorage.getItem("playerData");
+        console.log(storedPlayerData);
+        if (storedPlayerData) {
+            const { playerName, playerAvatar, isActive, isSet } =
+                JSON.parse(storedPlayerData);
+            setPlayerName(playerName);
+            setPlayerAvatar(playerAvatar);
+            setIsActive(isActive);
+            setIsSet(isSet);
+        }
+        if (storedPlayerData && urlRoomId) {
+            setIsSet(false);
+        }
+    }, []);
+
     const handleCreateRoom = (data: any) => {
         socket?.emit("createRoom", data, (ack: string) => {
             if (ack === "success" && data.type === "friend") {
@@ -88,7 +107,25 @@ export default function Home() {
     const handleSubmitPlayer = () => {
         if (playerName && playerAvatar && !urlRoomId) {
             setIsSet(true);
+            localStorage.setItem(
+                "playerData",
+                JSON.stringify({
+                    playerName,
+                    playerAvatar,
+                    isActive: false,
+                    isSet: true,
+                })
+            );
         } else if (playerName && playerAvatar && urlRoomId) {
+            localStorage.setItem(
+                "playerData",
+                JSON.stringify({
+                    playerName,
+                    playerAvatar,
+                    isActive: false,
+                    isSet: true,
+                })
+            );
             joinFriend();
         } else {
             alert("Please select a name and an avatar!");
