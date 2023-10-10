@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { BsCircleFill } from "react-icons/bs";
+import DesktopUI from "../../components/DesktopUI";
 
 const Waiting = () => {
     const router = useRouter();
@@ -51,39 +52,41 @@ const Waiting = () => {
     };
 
     return (
-        <main className="h-screen w-screen flex justify-center items-center">
-            <div className="relative w-3/5">
-                <div className="flex flex-col items-center h-fit gap-6 px-4 py-10 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
-                    <p className="text-xl font-bold">
-                        Waiting for someone to join. Be patient 😉
-                    </p>
-                    <div className="flex gap-1 p-2">
-                        {circleData.map((dot, index) => (
-                            <React.Fragment key={`dot${index}`}>
-                                <BsCircleFill
-                                    className={`text-lg ${dot.color} ${dot.animation}`}
-                                />
-                            </React.Fragment>
-                        ))}
+        <DesktopUI>
+            <main className="h-full w-full flex justify-center items-center">
+                <div className="relative w-3/5">
+                    <div className="flex flex-col items-center h-fit gap-6 px-4 py-10 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
+                        <p className="text-xl font-bold">
+                            Waiting for someone to join. Be patient 😉
+                        </p>
+                        <div className="flex gap-1 p-2">
+                            {circleData.map((dot, index) => (
+                                <React.Fragment key={`dot${index}`}>
+                                    <BsCircleFill
+                                        className={`text-lg ${dot.color} ${dot.animation}`}
+                                    />
+                                </React.Fragment>
+                            ))}
+                        </div>
+                        <p
+                            className={`p-2 border-2 border-black cursor-pointer ${
+                                invite === null ? "hidden" : ""
+                            }`}
+                            onClick={() => {
+                                if (invite !== null) {
+                                    const text = `${window.location.origin}/?rid=${invite}`;
+                                    copyToClipboard(text);
+                                }
+                            }}
+                        >
+                            {window.location.origin}/?rid=${invite}
+                        </p>
                     </div>
-                    <p
-                        className={`p-2 border-2 border-black cursor-pointer ${
-                            invite === null ? "hidden" : ""
-                        }`}
-                        onClick={() => {
-                            if (invite !== null) {
-                                const text = `${window.location.origin}/?rid=${invite}`;
-                                copyToClipboard(text);
-                            }
-                        }}
-                    >
-                        {window.location.origin}/?rid=${invite}
-                    </p>
+                    <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-pink-300 rounded-sm z-[3] translate-x-0 translate-y-0"></span>
+                    <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-yellow-300 rounded-sm z-[2] translate-x-2 translate-y-2"></span>
                 </div>
-                <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-pink-300 rounded-sm z-[3] translate-x-0 translate-y-0"></span>
-                <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-yellow-300 rounded-sm z-[2] translate-x-2 translate-y-2"></span>
-            </div>
-        </main>
+            </main>
+        </DesktopUI>
     );
 };
 

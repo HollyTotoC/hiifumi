@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useSocket } from "../../utils/socketContext";
 import { usePathname, useSearchParams } from "next/navigation";
 import { PlayerType, RoomType } from "../../types";
+import DesktopUI from "../../components/DesktopUI";
 
 const Game = () => {
     const socket = useSocket();
@@ -74,7 +75,7 @@ const Game = () => {
     }, [socket, roomId, lpi, room]);
 
     useEffect(() => {
-        // console.info("turn", turn);
+        console.info("turn", turn);
 
         const handleAnimationEnd = () => {
             if (socket && roomId && result) {
@@ -126,27 +127,29 @@ const Game = () => {
     }
 
     return (
-        <main className="h-screen flex flex-col">
-            <PlayerSection
-                playerName={remotePlayer?.name}
-                playerScore={remotePlayer?.score}
-                playerAvatar={remotePlayer?.avatar}
-                isReversed={false}
-                bgColor={"violet-300"}
-                border={"b"}
-            />
-            <section className="flex items-center justify-center grow overflow-hidden">
-                {gameConntent}
-            </section>
-            <PlayerSection
-                playerName={localPlayer?.name}
-                playerScore={localPlayer?.score}
-                playerAvatar={localPlayer?.avatar}
-                isReversed={true}
-                bgColor={"orange-300"}
-                border={"t"}
-            />
-        </main>
+        <DesktopUI>
+            <main className="h-full flex flex-col">
+                <PlayerSection
+                    playerName={remotePlayer?.name}
+                    playerScore={remotePlayer?.score}
+                    playerAvatar={remotePlayer?.avatar}
+                    isReversed={false}
+                    bgColor={"violet-300"}
+                    border={"b"}
+                />
+                <section className="flex items-center justify-center grow overflow-hidden">
+                    {gameConntent}
+                </section>
+                <PlayerSection
+                    playerName={localPlayer?.name}
+                    playerScore={localPlayer?.score}
+                    playerAvatar={localPlayer?.avatar}
+                    isReversed={true}
+                    bgColor={"orange-300"}
+                    border={"t"}
+                />
+            </main>
+        </DesktopUI>
     );
 };
 

@@ -5,12 +5,15 @@ import { useSocket } from "./utils/socketContext";
 import { useSearchParams } from "next/navigation";
 import Button from "./components/Button";
 import Image from "next/image";
+import DesktopUI from "./components/DesktopUI";
+import About from "./components/About";
 
 export default function Home() {
     const router = useRouter();
     const socket = useSocket();
     const urlRoomId = useSearchParams().get("rid");
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isActive, setIsActive] = useState(true);
     const [isSet, setIsSet] = useState(false);
     const [playerName, setPlayerName] = useState("");
@@ -96,18 +99,22 @@ export default function Home() {
         setIsSet(false);
     }
 
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
     return (
-        <>
+        <DesktopUI>
             <header
-                className={`z-20 absolute top-0 left-0 right-0 w-screen bg-white flex items-center justify-center flex-col border-b-2 border-opacity-1 ${
+                className={`z-20 absolute top-0 left-0 right-0 w-full grow bg-white flex items-center justify-center flex-col border-b-2 border-opacity-1 ${
                     isActive
-                        ? "h-full min-h-screen p-10 border-white"
+                        ? "h-full min-h-full p-10 border-white"
                         : "animate-customBorder"
                 }`}
             >
                 {!isActive ? (
                     <div
-                        className={`flex flex-row justify-between w-full opacity-0 ${
+                        className={`flex flex-row justify-between w-full opacity-0 p-2 ${
                             !isDelayed ? "animate-customFadeIn" : ""
                         }`}
                     >
@@ -148,7 +155,7 @@ export default function Home() {
                                 <span className="text-teal-600">Mi</span>
                             </h1>
                             <p
-                                className={`text-2xl transition-all  duration-700`}
+                                className={`text-2xl transition-all  duration-700 md:w-2/3`}
                             >
                                 Here you can challenge your friends or strangers
                                 in a hi&#8209;fu&#8209;mi game.
@@ -164,7 +171,7 @@ export default function Home() {
                 )}
             </header>
             <section
-                className={`absolute top left-0 right-0 h-[100vh] w-screen flex flex-col items-center justify-start z-10 grow pt-[50px] bg-green-300 transition-all duration-700 ${
+                className={`absolute top left-0 right-0 h-full w-full flex flex-col items-center justify-start z-10 grow pt-[50px] bg-green-300 transition-all duration-700 ${
                     !isSet ? "top-0" : "top-[-100%]"
                 }`}
             >
@@ -239,19 +246,20 @@ export default function Home() {
                     />
                 </form>
             </section>
-            <main className="relative h-[100vh] w-screen flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
-                <div className="flex flex-col px-10 mt-auto mb-auto gap-16">
-                    <div className="flex flex-col items-center gap-3 mb-3">
+            <main className="relative h-full w-full flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
+                <div className="flex flex-col px-10 mt-auto mb-auto gap-9 md:gap-16">
+                    <div className="flex flex-col items-center gap-3 md:mb-3">
                         <Image
                             src={`/avatar/1.svg`}
                             alt={`Avatar Salon`}
                             width={80}
                             height={80}
-                            className="p-1 bg-white border-2 border-black rounded-full"
+                            className="p-1 md:mb-5 bg-white border-2 border-black rounded-full"
                         />
-                        <p className="text-justify font-semibold">
+                        <p className="text-justify font-semibold md:w-2/3">
                             You&apos;re ready to step into the arena and test
                             your skills in Rock Paper Scissors !<br />
+                            <br />
                             Brace yourself to face your opponents and showcase
                             your mastery of the game. May the best player win !
                         </p>
@@ -266,9 +274,31 @@ export default function Home() {
                             content="Play&nbsp;random&nbsp;player"
                             onClick={playWithRandomPlayer}
                         />
+
+                        <div className="lg:hidden">
+                            <Button content="About" onClick={toggleModal} />
+                        </div>
                     </div>
                 </div>
+                <dialog
+                    open={isModalOpen}
+                    className={`w-screen h-screen z-50 fixed inset-0 bg-white transition-transform transform ${
+                        isModalOpen ? "translate-y-0" : "translate-y-full"
+                    }`}
+                >
+                    <div className="absolute top-4 right-4">
+                        <button
+                            onClick={toggleModal}
+                            className="text-2xl font-bold"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                    <div className="flex items-center justify-center h-full">
+                        <About className="w-full h-full" />
+                    </div>
+                </dialog>
             </main>
-        </>
+        </DesktopUI>
     );
 }
