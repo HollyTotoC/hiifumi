@@ -12,6 +12,10 @@ const app = express();
 // Use the cors middleware
 app.use(cors());
 
+app.get("/health", (req, res) => {
+  res.status(200).send("Server is running!");
+});
+
 const server = http.createServer(app);
 console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
@@ -322,3 +326,5 @@ const PORT = 3001;
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+export default server;
