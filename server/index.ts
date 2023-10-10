@@ -1,6 +1,7 @@
 import { instrument } from "@socket.io/admin-ui";
 
 import express from "express";
+import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors"; // <-- Import the cors library
@@ -8,6 +9,7 @@ import { isValidMove, determineWinner } from "./utils/gameLogic.js";
 import { createRoom, findAvailableRoom } from "./utils/roomManager.js";
 
 const app = express();
+dotenv.config();
 
 // Use the cors middleware
 app.use(cors());
@@ -322,9 +324,9 @@ instrument(io, {
   mode: "development",
 });
 
-const PORT = 3001;
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const port = process.env.PORT || 3001;
+server.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
 
 export default server;
