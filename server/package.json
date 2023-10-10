@@ -27,7 +27,8 @@
     "scripts": {
         "lint": "eslint '*/**/*.{js,ts,tsx}'",
         "format": "prettier --write '*/**/*.{js,ts,tsx}'",
-        "start": "nodemon --exec \"node --loader ts-node/esm index.ts\""
+        "start": "nodemon --exec \"node --loader ts-node/esm index.ts\"",
+        "build": "tsc"
     },
     "type": "module"
 }
