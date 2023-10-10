@@ -4,8 +4,8 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors"; // <-- Import the cors library
-import { isValidMove, determineWinner } from "./utils/gameLogic.ts";
-import { createRoom, findAvailableRoom } from "./utils/roomManager.ts";
+import { isValidMove, determineWinner } from "./utils/gameLogic.js";
+import { createRoom, findAvailableRoom } from "./utils/roomManager.js";
 
 const app = express();
 

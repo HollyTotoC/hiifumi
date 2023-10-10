@@ -1,4 +1,4 @@
-import { Player, Room, Rooms } from "../type";
+import { Player, Room, Rooms } from "../../type";
 
 export const createRoom = (isPrivate: boolean): string => {
   const roomId = generateRoomId();
