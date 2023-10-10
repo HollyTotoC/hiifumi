@@ -9,7 +9,7 @@
         "strict": true,
         "skipLibCheck": true,
         "moduleResolution": "node",
-        "baseUrl": "../",
+        "baseUrl": "./",
         "preserveSymlinks": true,
         "noImplicitAny": true
     },
