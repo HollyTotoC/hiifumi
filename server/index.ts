@@ -23,7 +23,7 @@ console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://admin.socket.io", "https://hiifumi-hi-fu-mi.vercel.app"],
+    origin: ["http://localhost:3000", "https://admin.socket.io", "https://hiifumi-hi-fu-mi.vercel.app", "https://hiifumi-hi-fu-mi.vercel.app", "https://hifumi-server.adaptable.app:3001"],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
