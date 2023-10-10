@@ -23,7 +23,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        const newSocket = io("http://localhost:3001"); // Adjust the server URL if needed
+        const newSocket = io(
+            process.env.REACT_APP_SOCKET_URL ||
+                "https://hifumi-server.adaptable.app"
+        );
         setSocket(newSocket);
         console.log("Connected to the server!");
 

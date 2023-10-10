@@ -23,12 +23,13 @@ console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://admin.socket.io"],
+    origin: ["http://localhost:3000", "https://admin.socket.io", "https://hiifumi-hi-fu-mi.vercel.app"],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
 });
+
 
 const BOTH_PLAYERS_CONNECTED = 1;
 const SHOW_RESULT = 2;
@@ -359,7 +360,7 @@ instrument(io, {
 
 const port = process.env.PORT || 3001;
 server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on ${port}`);
 });
 
 export default server;
