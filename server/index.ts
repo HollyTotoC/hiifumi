@@ -1,4 +1,7 @@
 import { instrument } from "@socket.io/admin-ui";
+import { join } from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 import express from "express";
 import dotenv from "dotenv";
@@ -18,6 +21,32 @@ app.get("/health", (req, res) => {
   res.status(200).send("Server is running!");
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.use(
+  "/admin",
+  express.static(
+    join(__dirname, "..", "node_modules", "@socket.io", "admin-ui"),
+  ),
+);
+
+app.use(
+  "/admin",
+  express.static(
+    join(
+      __dirname,
+      "..",
+      "server",
+      "node_modules",
+      "@socket.io",
+      "admin-ui",
+      "ui",
+      "dist",
+    ),
+  ),
+);
+
 const server = http.createServer(app);
 console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
@@ -25,14 +54,20 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:3000",
+      "http://localhost:3001",
       "https://admin.socket.io",
       "https://hifumi.vercel.app",
       "https://hifumi-server.adaptable.app:3001",
     ],
     methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
+    allowedHeaders: ["*"],
     credentials: true,
   },
+});
+
+instrument(io, {
+  auth: false,
+  mode: "development",
 });
 
 const BOTH_PLAYERS_CONNECTED = 1;
@@ -420,11 +455,6 @@ io.on("connection", (socket) => {
       }
     }
   });
-});
-
-instrument(io, {
-  auth: false,
-  mode: "development",
 });
 
 const port = process.env.PORT || 3001;
