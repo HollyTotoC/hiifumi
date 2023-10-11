@@ -23,13 +23,18 @@ console.log("Server starting... yeeaah");
 // Configure CORS for Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://admin.socket.io", "https://hiifumi-hi-fu-mi.vercel.app", "https://hiifumi-hi-fu-mi.vercel.app", "https://hifumi-server.adaptable.app:3001"],
+    origin: [
+      "http://localhost:3000",
+      "https://admin.socket.io",
+      "https://hiifumi-hi-fu-mi.vercel.app",
+      "https://hiifumi-hi-fu-mi.vercel.app",
+      "https://hifumi-server.adaptable.app:3001",
+    ],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
 });
-
 
 const BOTH_PLAYERS_CONNECTED = 1;
 const SHOW_RESULT = 2;
@@ -71,6 +76,43 @@ class Room {
 const rooms: Map<string, Room> = new Map();
 const randomQueue: Player[] = [];
 const friendQueue: Map<string, Player[]> = new Map();
+
+const cleanupPlayerState = (playerId: string, roomId: string) => {
+  // Remove player from any room they might be in
+  for (const room of rooms.values()) {
+    if (room.p1 && room.p1.id === playerId) {
+      rooms.delete(room.id);
+      break; // Assuming a player can't be in more than one room
+    } else if (room.p2 && room.p2.id === playerId) {
+      rooms.delete(room.id);
+      break; // Assuming a player can't be in more than one room
+    }
+  }
+
+  // Remove player from the random queue
+  const indexInRandomQueue = randomQueue.findIndex(
+    (player) => player.id === playerId,
+  );
+  if (indexInRandomQueue !== -1) {
+    randomQueue.splice(indexInRandomQueue, 1);
+  }
+
+  // If roomId is provided, remove the player from the friend queue for that room
+  if (roomId) {
+    const friendQueueForRoom = friendQueue.get(roomId);
+    if (friendQueueForRoom) {
+      const indexInFriendQueue = friendQueueForRoom.findIndex(
+        (player) => player.id === playerId,
+      );
+      if (indexInFriendQueue !== -1) {
+        friendQueueForRoom.splice(indexInFriendQueue, 1);
+        if (friendQueueForRoom.length === 0) {
+          friendQueue.delete(roomId); // Delete the room from the friend queue if it's empty
+        }
+      }
+    }
+  }
+};
 
 const handlePlayerMove = (
   roomId: string,
@@ -156,6 +198,8 @@ io.on("connection", (socket) => {
     const roomId = data.roomId;
     const playerInfo = data.player;
     const type = data.type;
+    cleanupPlayerState(socket.id, roomId);
+    console.log("Player state clean...");
 
     const player = new Player(socket.id, playerInfo.name, playerInfo.avatar);
     if (type === "friend") {
@@ -338,16 +382,42 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    console.log("A user disconnected", socket.id);
 
-    for (const roomId in rooms) {
+    // Remove from randomQueue
+    const index = randomQueue.findIndex((player) => player.id === socket.id);
+    if (index !== -1) {
+      randomQueue.splice(index, 1);
+    }
+
+    // Remove from friendQueue
+    for (const [roomId, players] of friendQueue.entries()) {
+      const playerIndex = players.findIndex(
+        (player) => player.id === socket.id,
+      );
+      if (playerIndex !== -1) {
+        players.splice(playerIndex, 1);
+        if (players.length === 0) {
+          friendQueue.delete(roomId);
+        }
+      }
+    }
+
+    // Handle in-game disconnect
+    for (const roomId of rooms.keys()) {
       const room = rooms.get(roomId);
-
-      // Si l'un des joueurs est le joueur déconnecté, mettez à jour displayStep
-      if (
-        (room?.p1 && room.p1.id === socket.id) ||
-        (room?.p2 && room.p2.id === socket.id)
-      ) {
+      if (room) {
+        if (
+          (room.p1 && room.p1.id === socket.id) ||
+          (room.p2 && room.p2.id === socket.id)
+        ) {
+          room.displayStep = 3; // or any value that represents the end of the game due to disconnection
+          io.to(roomId).emit("updateRoom", room);
+          io.to(roomId).emit("playerDisconnected", {
+            message: "The other player has disconnected. You win!",
+          });
+          rooms.delete(roomId);
+        }
       }
     }
   });

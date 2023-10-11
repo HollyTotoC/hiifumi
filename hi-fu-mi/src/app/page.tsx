@@ -32,12 +32,12 @@ export default function Home() {
         }
     }, [isActive]);
 
-    console.log(playerName, playerAvatar, isActive, isSet);
+    // console.log(playerName, playerAvatar, isActive, isSet);
 
     useEffect(() => {
         // Récupération des données du localStorage
         const storedPlayerData = localStorage.getItem("playerData");
-        console.log(storedPlayerData);
+        // console.log(storedPlayerData);
         if (storedPlayerData) {
             const { playerName, playerAvatar, isActive, isSet } =
                 JSON.parse(storedPlayerData);
@@ -50,6 +50,16 @@ export default function Home() {
             setIsSet(false);
         }
     }, []);
+
+    function debounce(func, delay) {
+        let inDebounce;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(inDebounce);
+            inDebounce = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
 
     const handleCreateRoom = (data: any) => {
         socket?.emit("createRoom", data, (ack: string) => {
@@ -304,16 +314,19 @@ export default function Home() {
                     <div className="flex flex-col items-center gap-10 mb-4">
                         <Button
                             content="Play&nbsp;with&nbsp;a&nbsp;friend"
-                            onClick={playWithFriend}
+                            onClick={debounce(playWithFriend, 300)}
                         />
 
                         <Button
                             content="Play&nbsp;random&nbsp;player"
-                            onClick={playWithRandomPlayer}
+                            onClick={debounce(playWithRandomPlayer, 300)}
                         />
 
                         <div className="lg:hidden">
-                            <Button content="About" onClick={toggleModal} />
+                            <Button
+                                content="About"
+                                onClick={debounce(toggleModal, 300)}
+                            />
                         </div>
                     </div>
                 </div>

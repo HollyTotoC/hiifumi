@@ -1,0 +1,23 @@
+name: "hifumi-server"
+
+type: "nodejs:20"
+
+disk: 2048
+
+source:
+    root: "server"
+
+hooks:
+    build: |
+        npm install
+        npm run build  # This is the command that builds your app and generates the 'dist' directory.
+
+web:
+    commands:
+        start: npm run start
+    locations:
+        "/":
+            root: "dist"
+            passthru: true
+            index: ["index.html"]
+            allow: true
