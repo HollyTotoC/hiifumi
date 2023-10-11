@@ -303,9 +303,9 @@ export default function Home() {
                         <Image
                             src={`/avatar/master.svg`}
                             alt={`Avatar Salon`}
-                            width={80}
-                            height={80}
-                            className="p-1 md:mb-5 bg-white border-2 border-black rounded-full"
+                            width={60}
+                            height={60}
+                            className="p-3 md:mb-5 bg-white border-2 border-black rounded-full"
                         />
                         <p className="text-justify font-semibold md:w-2/3">
                             You&apos;re ready to step into the arena and test
