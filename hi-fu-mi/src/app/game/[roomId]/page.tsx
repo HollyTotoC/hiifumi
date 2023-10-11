@@ -135,7 +135,7 @@ const Game = () => {
                     playerAvatar={remotePlayer?.avatar}
                     isReversed={false}
                     bgColor={"violet-300"}
-                    border={"b"}
+                    border={"border-b-2"}
                 />
                 <section className="flex items-center justify-center grow overflow-hidden">
                     {gameConntent}
@@ -146,7 +146,7 @@ const Game = () => {
                     playerAvatar={localPlayer?.avatar}
                     isReversed={true}
                     bgColor={"orange-300"}
-                    border={"t"}
+                    border={"border-t-2"}
                 />
             </main>
         </DesktopUI>

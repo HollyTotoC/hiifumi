@@ -21,7 +21,7 @@ const PlayerSection = ({
 }: PlayerSectionProps) => {
     return (
         <section
-            className={`border-${border}-2 border-black bg-${bgColor} flex ${
+            className={`${border} border-black bg-${bgColor} flex ${
                 isReversed ? "flex-row-reverse" : "flex-row"
             } justify-end items-center gap-2 p-2`}
         >
