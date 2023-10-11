@@ -25,7 +25,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     useEffect(() => {
         const newSocket = io(
             process.env.REACT_APP_SOCKET_URL ||
-                "https://hifumi-server.adaptable.app"
+                "https://main-bvxea6i-sgnfs6tkb2bvk.fr-3.platformsh.site"
         );
         setSocket(newSocket);
         console.log("Connected to the server!");
