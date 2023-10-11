@@ -340,16 +340,16 @@ export default function Home() {
                         isModalOpen ? "translate-y-0" : "translate-y-full"
                     }`}
                 >
-                    <div className="absolute top-4 right-4">
+                    <div className="absolute top-3 right-4 z-50">
                         <button
                             onClick={toggleModal}
-                            className="text-2xl font-bold"
+                            className="text-2xl font-bold bg-white border-2 border-black rounded-full w-10 h-10 flex items-center justify-center"
                         >
                             &times;
                         </button>
                     </div>
                     <div className="flex items-center justify-center h-full">
-                        <About className="w-full h-full" />
+                        <About className="w-full h-full  pt-4" />
                     </div>
                 </dialog>
             </main>

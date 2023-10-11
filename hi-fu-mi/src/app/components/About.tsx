@@ -29,7 +29,7 @@ const About = ({ className }: AboutProps) => {
                             />
                         </div>
 
-                        <div className="flex flex-col w-2/3 h-full">
+                        <div className="flex flex-col w-full md:w-2/3 h-full">
                             <h2 className="text-2xl font-bold mb-3">
                                 À propos de moi
                             </h2>
