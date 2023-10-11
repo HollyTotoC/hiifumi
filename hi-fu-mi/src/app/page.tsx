@@ -301,7 +301,7 @@ export default function Home() {
                 <div className="flex flex-col px-10 mt-auto mb-auto gap-9 md:gap-16">
                     <div className="flex flex-col items-center gap-3 md:mb-3">
                         <Image
-                            src={`/avatar/1.svg`}
+                            src={`/avatar/master.svg`}
                             alt={`Avatar Salon`}
                             width={80}
                             height={80}
