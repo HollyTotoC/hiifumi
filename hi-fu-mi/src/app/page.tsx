@@ -336,7 +336,7 @@ export default function Home() {
                 </div>
                 <dialog
                     open={isModalOpen}
-                    className={`w-screen h-screen z-50 fixed inset-0 bg-white transition-transform transform ${
+                    className={`w-screen h-full z-50 fixed inset-0 bg-white transition-transform transform ${
                         isModalOpen ? "translate-y-0" : "translate-y-full"
                     }`}
                 >
