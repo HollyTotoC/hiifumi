@@ -298,7 +298,7 @@ export default function Home() {
                 </form>
             </section>
             <main className="relative h-full w-full flex flex-col items-center justify-start grow pt-[50px] bg-orange-300">
-                <div className="flex flex-col px-10 mt-auto mb-auto gap-9 md:gap-16">
+                <div className="flex flex-col px-10 mt-auto mb-auto gap-9 md:gap-16 py-4">
                     <div className="flex flex-col items-center gap-3 md:mb-3">
                         <Image
                             src={`/avatar/master.svg`}

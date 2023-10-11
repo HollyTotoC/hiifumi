@@ -19,8 +19,8 @@ const DesktopUI = ({ children }: DesktopUIProps) => {
 
     return (
         <div className="flex h-full grow items-stretch">
-            <About className={`hidden h-fit lg:flex w-1/2`} />
-            <div className="w-full flex min-h-fit lg:w-1/2 !bg-white relative grow">
+            <About className={`hidden h-screen lg:flex w-1/2`} />
+            <div className="w-full flex min-h-full lg:w-1/2 !bg-white relative grow">
                 <div className="flex flex-col grow lg:mx-8 lg:my-14 relative overflow-hidden lg:border-2 lg:border-black">
                     {children}
                 </div>
