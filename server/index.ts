@@ -26,8 +26,7 @@ const io = new Server(server, {
     origin: [
       "http://localhost:3000",
       "https://admin.socket.io",
-      "https://hiifumi-hi-fu-mi.vercel.app",
-      "https://hiifumi-hi-fu-mi.vercel.app",
+      "https://hifumi.vercel.app",
       "https://hifumi-server.adaptable.app:3001",
     ],
     methods: ["GET", "POST"],
