@@ -51,12 +51,16 @@ export default function Home() {
         }
     }, []);
 
-    function debounce(func, delay) {
-        let inDebounce;
-        return function () {
+    function debounce<F extends (...args: any[]) => any>(
+        func: F,
+        delay: number
+    ): (...args: Parameters<F>) => void {
+        let inDebounce: ReturnType<typeof setTimeout> | undefined;
+        return function (this: EventTarget, ...args: Parameters<F>) {
             const context = this;
-            const args = arguments;
-            clearTimeout(inDebounce);
+            if (inDebounce) {
+                clearTimeout(inDebounce);
+            }
             inDebounce = setTimeout(() => func.apply(context, args), delay);
         };
     }
