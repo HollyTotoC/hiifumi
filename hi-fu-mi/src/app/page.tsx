@@ -198,7 +198,7 @@ export default function Home() {
                         >
                             <h1 className={`font-bold text-6xl`}>
                                 <span className={`text-2xl`}>
-                                    Welcome to
+                                    Bienvenue sur
                                     <br />
                                 </span>
                                 <span className="text-pink-300">Hi</span>
@@ -208,8 +208,8 @@ export default function Home() {
                             <p
                                 className={`text-2xl transition-all  duration-700 md:w-2/3`}
                             >
-                                Here you can challenge your friends or strangers
-                                in a hi&#8209;fu&#8209;mi game.
+                                Ici, vous pouvez défier vos amis ou des inconnus
+                                dans une partie de 🪨 📃 ✂️.
                             </p>
                         </div>
                         <div className={`mt-16`}>
@@ -240,7 +240,7 @@ export default function Home() {
                                 htmlFor="playerName"
                                 className="text-xl font-semibold"
                             >
-                                Player Name
+                                Nom du joueur
                             </label>
                             <input
                                 className="border-b-2 border-black bg-transparent text-base pb-1 focus-visible::border-b-2 focus-visible::border-black focus-visible::outline-none"
@@ -255,7 +255,7 @@ export default function Home() {
                                 htmlFor="playerAvatar"
                                 className="pb-4 text-xl font-semibold"
                             >
-                                Player Avatar
+                                Avatar
                             </label>
                             <ul className="avatar-list flex flex-row items-center justify-evenly gap-4 w-full text-base flex-wrap">
                                 {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -292,7 +292,7 @@ export default function Home() {
                     </div>
                     <Button
                         type="submit"
-                        content="Ready&nbsp;!"
+                        content="Prêt&nbsp;!"
                         onClick={handleSubmitPlayer}
                     />
                 </form>
@@ -308,27 +308,29 @@ export default function Home() {
                             className="p-3 md:mb-5 bg-white border-2 border-black rounded-full"
                         />
                         <p className="text-justify font-semibold md:w-2/3">
-                            You&apos;re ready to step into the arena and test
-                            your skills in Rock Paper Scissors !<br />
+                            Vous êtes prêt à entrer dans l&apos;arène et à
+                            tester vos compétences au Pierre-Papier-Ciseaux !
                             <br />
-                            Brace yourself to face your opponents and showcase
-                            your mastery of the game. May the best player win !
+                            <br />
+                            Préparez-vous à affronter vos adversaires et à
+                            démontrer votre maîtrise du jeu. Que le meilleur
+                            joueur gagne !
                         </p>
                     </div>
                     <div className="flex flex-col items-center gap-10 mb-4">
                         <Button
-                            content="Play&nbsp;with&nbsp;a&nbsp;friend"
+                            content="Défier&nbsp;un&nbsp;ami"
                             onClick={debounce(playWithFriend, 300)}
                         />
 
                         <Button
-                            content="Play&nbsp;random&nbsp;player"
+                            content="Défier&nbsp;un&nbsp;inconnu"
                             onClick={debounce(playWithRandomPlayer, 300)}
                         />
 
                         <div className="lg:hidden">
                             <Button
-                                content="About"
+                                content="À&nbsp;propos"
                                 onClick={debounce(toggleModal, 300)}
                             />
                         </div>

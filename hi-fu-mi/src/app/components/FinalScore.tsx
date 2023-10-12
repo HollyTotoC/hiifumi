@@ -28,9 +28,9 @@ const FinalScore = ({ remotePlayer, localPlayer, room }: FinalScoreProps) => {
                         {remotePlayer?.score !== undefined &&
                         localPlayer?.score !== undefined
                             ? remotePlayer.score > localPlayer.score
-                                ? "🫢 You lost 🫣"
-                                : "👑 You won 🍾"
-                            : "Scores are not available"}
+                                ? "🫢 Dommage 🫣"
+                                : "👑 Bravo 🍾"
+                            : "🤔 Pardon, il y a eu un soucis"}
                     </p>
                     <div className="flex items-center justify-center mt-5">
                         <div className="flex flex-col items-center justify-center text-center px-4 border-r border-black">
@@ -73,7 +73,10 @@ const FinalScore = ({ remotePlayer, localPlayer, room }: FinalScoreProps) => {
                 <span className="absolute top-0 right-0 bottom-0 left-0 border-2 border-black bg-green-300 rounded-sm z-[2] translate-x-2 translate-y-2"></span>
             </div>
             <div className="flex justify-center mt-12">
-                <Button content="Return to home" onClick={handleClick} />
+                <Button
+                    content="Encore&nbsp;une&nbsp;?"
+                    onClick={handleClick}
+                />
             </div>
         </div>
     );

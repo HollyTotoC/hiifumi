@@ -71,8 +71,8 @@ const About = ({ className }: AboutProps) => {
                 <Frame className="">
                     <h2 className="text-2xl font-bold mb-3">Le Projet</h2>
                     <p className="mt-2 text-gray-700">
-                        Hifumi est un projet en ligne que j&apos;ai développé
-                        pour m&apos;exercer sur Next.js 13, Tailwind CSS et
+                        Hifumi est un projet React que j&apos;ai développé pour
+                        m&apos;exercer sur Next.js 13, Tailwind CSS et
                         Socket.IO. C&apos;est une plateforme de jeu en temps
                         réel où les joueurs peuvent s&apos;affronter au jeu de
                         Pierre-papier-ciseaux.

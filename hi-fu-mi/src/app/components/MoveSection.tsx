@@ -19,10 +19,10 @@ const MoveSection = ({ playerId, handleMoveSelection }: MoveSectionProps) => {
 
     return (
         <div className="relative z-50 flex flex-col items-center justify-center gap-10">
-            <Loading textContent="Waiting for opponent move" />
+            <Loading textContent="Ton adversaire réfléchit" />
             <div className="relative w-2/3">
                 <div className="flex flex-col items-center h-fit gap-1 p-4 px-2 text-center border-2 border-black bg-white relative z-[4] translate-x-[-0.5rem] translate-y-[-0.5rem]">
-                    <p className="text-xl font-bold mb-6">Select your move</p>
+                    <p className="text-xl font-bold mb-6">A toi de jouer !</p>
                     <form className="move-choice-list flex flex-wrap items-center justify-center gap-14 p-4">
                         {moveChoices.map((move, index) => (
                             <div key={`dot${index}`} className="group">

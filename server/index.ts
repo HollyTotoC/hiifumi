@@ -57,6 +57,8 @@ const io = new Server(server, {
       "http://localhost:3001",
       "https://admin.socket.io",
       "https://hifumi.vercel.app",
+      "https://hifumi.fr",
+      "https://www.hifumi.fr",
       "https://hifumi-server.adaptable.app:3001",
     ],
     methods: ["GET", "POST"],
