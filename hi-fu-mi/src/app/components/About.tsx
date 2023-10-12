@@ -43,7 +43,7 @@ const About = ({ className }: AboutProps) => {
                                     href="https://totocerta.dev"
                                     target="_blank"
                                     rel="noopener noreferrer external"
-                                    className="text-teal-600 no-underline mr-4 font-semibold"
+                                    className="text-teal-600 no-underline mr-4 font-semibold hover:border-b-2 hover:border-teal-600"
                                 >
                                     Portfolio
                                 </a>
@@ -51,7 +51,7 @@ const About = ({ className }: AboutProps) => {
                                     href="https://www.linkedin.com/in/toto-certa/"
                                     target="_blank"
                                     rel="noopener noreferrer external"
-                                    className="text-teal-600 no-underline mr-4 font-semibold"
+                                    className="text-teal-600 no-underline mr-4 font-semibold hover:border-b-2 hover:border-teal-600"
                                 >
                                     LinkedIn
                                 </a>
@@ -59,7 +59,7 @@ const About = ({ className }: AboutProps) => {
                                     href="https://https://github.com/HollyTotoC"
                                     target="_blank"
                                     rel="noopener noreferrer external"
-                                    className="text-teal-600 no-underline font-semibold"
+                                    className="text-teal-600 no-underline font-semibold hover:border-b-2 hover:border-teal-600"
                                 >
                                     GitHub
                                 </a>

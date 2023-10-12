@@ -1,22 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100&display=swap');
 
 
 html {
   height: -webkit-fill-available;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Lato', sans-serif;
+}
+
 body {
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   min-height: -webkit-fill-available;
   min-height: 100vh;
+  max-width: 1400px ;
     display: flex;
     align-items: stretch;
     
     flex-direction: column;
 }
+
+
 
 @supports (-webkit-touch-callout: none) {
   body {
